@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Make a referral to Big Hearts Disability Services — NDIS registered provider in Blacktown, Sydney. 3-step referral form." />
+  <title>Make a Referral | Big Hearts Disability Services</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://bigheartsdisabilityservices.com.au/wp-content/uploads/2024/05/cropped-Big-Hearts-Logo-files-28-32x32.png" />
+
+  <style>
+    /* ── Referral form styles (scoped) ── */
+    .rf { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* Progress stepper */
+    .rf-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 560px;
+      margin: 0 auto 40px;
+    }
+    .rf-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      flex: 1;
+      position: relative;
+    }
+    .rf-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 18px; left: 50%;
+      width: 100%; height: 3px;
+      background: #e0cff0;
+      z-index: 0;
+      transition: background 0.4s;
+    }
+    .rf-step.done:not(:last-child)::after,
+    .rf-step.active:not(:last-child)::after { background: #662C91; }
+    .rf-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #e0cff0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 900; font-size: 15px;
+      color: #662C91;
+      position: relative; z-index: 1;
+      transition: background 0.3s, color 0.3s;
+    }
+    .rf-step.active .rf-dot { background: #662C91; color: #fff; }
+    .rf-step.done .rf-dot   { background: #8BC53E; color: #fff; }
+    .rf-dot-lbl { font-size: 12px; font-weight: 700; color: #aaa; white-space: nowrap; }
+    .rf-step.active .rf-dot-lbl { color: #662C91; }
+    .rf-step.done .rf-dot-lbl   { color: #8BC53E; }
+
+    /* Card */
+    .rf-card {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 48px rgba(102,44,145,0.12);
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 48px 44px;
+    }
+    .rf-step-title {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 22px; font-weight: 900;
+      color: #662C91; margin-bottom: 4px;
+    }
+    .rf-step-sub { font-size: 13px; color: #aaa; margin-bottom: 28px; }
+
+    /* Grid */
+    .rf-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .rf-row.full  { grid-template-columns: 1fr; }
+    .rf-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    /* Fields */
+    .rf-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .rf-label {
+      font-size: 13px; font-weight: 700; color: #444;
+    }
+    .rf-label .req { color: #662C91; margin-left: 2px; }
+    .rf input[type="text"],
+    .rf input[type="email"],
+    .rf input[type="tel"],
+    .rf input[type="date"],
+    .rf select,
+    .rf textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid #ddd; border-radius: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px; color: #333; background: #fafafa;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .rf input:focus, .rf select:focus, .rf textarea:focus {
+      outline: none; border-color: #662C91;
+      box-shadow: 0 0 0 3px rgba(102,44,145,0.10);
+      background: #fff;
+    }
+    .rf textarea { resize: vertical; min-height: 96px; }
+    .rf select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23662C91' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+      padding-right: 34px; cursor: pointer;
+    }
+    .rf input.err, .rf select.err, .rf textarea.err {
+      border-color: #e04040;
+      box-shadow: 0 0 0 3px rgba(224,64,64,.08);
+    }
+    .rf-errmsg { font-size: 12px; color: #e04040; margin-top: -4px; }
+
+    /* Checkboxes */
+    .rf-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 6px; }
+    .rf-check {
+      display: flex; align-items: center; gap: 9px;
+      background: #f7f3fb; border: 1.5px solid #e0cff0;
+      border-radius: 10px; padding: 10px 12px;
+      cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .rf-check:hover { border-color: #662C91; background: #f0e8f9; }
+    .rf-check input[type="checkbox"] { width: 17px; height: 17px; accent-color: #662C91; flex-shrink: 0; cursor: pointer; }
+    .rf-check span { font-size: 13px; color: #444; font-weight: 600; }
+
+    /* Radios */
+    .rf-radios { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .rf-radio {
+      display: flex; align-items: center; gap: 7px;
+      background: #f7f3fb; border: 1.5px solid #e0cff0;
+      border-radius: 30px; padding: 9px 18px;
+      cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .rf-radio:has(input:checked) { border-color: #662C91; background: #f0e8f9; }
+    .rf-radio input[type="radio"] { accent-color: #662C91; cursor: pointer; }
+    .rf-radio span { font-size: 14px; font-weight: 700; color: #444; }
+
+    /* Consent */
+    .rf-consent {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: #f7f3fb; border: 1.5px solid #e0cff0;
+      border-radius: 12px; padding: 16px; margin-top: 6px;
+    }
+    .rf-consent input[type="checkbox"] { width: 19px; height: 19px; accent-color: #662C91; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+    .rf-consent p { font-size: 13px; color: #555; line-height: 1.7; }
+
+    /* Nav buttons */
+    .rf-btnrow { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; gap: 12px; }
+    .rf-btn {
+      padding: 13px 32px; border-radius: 30px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 15px; font-weight: 800;
+      cursor: pointer; border: none;
+      transition: all .25s;
+    }
+    .rf-btn:hover { transform: translateY(-2px); }
+    .rf-btn-next   { background: #8BC53E; color: #fff; box-shadow: 0 6px 18px rgba(139,197,62,.4); }
+    .rf-btn-next:hover { box-shadow: 0 10px 24px rgba(139,197,62,.5); }
+    .rf-btn-back   { background: transparent; color: #662C91; border: 2px solid #662C91; }
+    .rf-btn-back:hover { background: #f0e8f9; }
+    .rf-btn-submit { background: #662C91; color: #fff; box-shadow: 0 6px 18px rgba(102,44,145,.35); }
+    .rf-btn-submit:hover { box-shadow: 0 10px 24px rgba(102,44,145,.5); }
+    .rf-btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    /* Panels */
+    .rf-panel { display: none; }
+    .rf-panel.active { display: block; }
+
+    /* Success */
+    .rf-success {
+      display: none; text-align: center; padding: 24px 0;
+    }
+    .rf-tick {
+      width: 80px; height: 80px;
+      background: #8BC53E; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      animation: popIn .5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .rf-tick svg { width: 38px; height: 38px; }
+    .rf-success h2 {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 30px; font-weight: 900;
+      color: #662C91; margin-bottom: 12px;
+    }
+    .rf-success p { font-size: 16px; color: #666; max-width: 440px; margin-inline: auto; line-height: 1.75; }
+    .rf-success .back-link { display: inline-block; margin-top: 28px; color: #662C91; font-weight: 700; font-size: 15px; }
+    .rf-success .back-link:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .rf-card { padding: 28px 20px 24px; }
+      .rf-row, .rf-row.three { grid-template-columns: 1fr; }
+      .rf-checks { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav id="mainNav" class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner container">
+    <a href="index.html" class="nav-logo" aria-label="Big Hearts home">
+      <img src="https://bigheartsdisabilityservices.com.au/wp-content/uploads/2024/05/Big-Hearts-Logo-files-36-e1715544242417-1024x268.png"
+           alt="Big Hearts Disability Services" />
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html#home"     class="nav-link">Home</a></li>
+      <li><a href="index.html#services" class="nav-link">Services</a></li>
+      <li><a href="index.html#about"    class="nav-link">About</a></li>
+      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
+    </ul>
+    <a href="referral.html" class="btn btn-green btn-sm nav-cta active-page">Make a Referral</a>
+    <button id="navToggle" class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobileMenu" class="mobile-menu" role="dialog" aria-modal="true">
+  <a href="index.html#home"     class="nav-link">Home</a>
+  <a href="index.html#services" class="nav-link">Services</a>
+  <a href="index.html#about"    class="nav-link">About</a>
+  <a href="index.html#contact"  class="nav-link">Contact</a>
+  <a href="referral.html" class="btn btn-green">Make a Referral</a>
+</div>
+
+
+<!-- ═══ PAGE HERO ═══ -->
+<div class="page-hero">
+  <div class="container">
+    <span class="lbl" style="color:rgba(255,255,255,0.5)">NDIS Registered Provider</span>
+    <h1>Make a Referral</h1>
+    <p>Refer someone to Big Hearts Disability Services. Our 3-step form takes under 5 minutes and our team will respond within 2 business days.</p>
+  </div>
+  <div class="wave">
+    <svg viewBox="0 0 1440 70" fill="#faf7ff" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" width="100%" height="70">
+      <path d="M0,35 C240,70 480,0 720,35 C960,70 1200,0 1440,35 L1440,70 L0,70 Z"/>
+    </svg>
+  </div>
+</div>
+
+
+<!-- ═══ FORM BODY ═══ -->
+<div class="referral-page-body">
+  <div class="container">
+    <div class="rf">
+
+      <!-- Stepper -->
+      <div class="rf-stepper" id="rfStepper">
+        <div class="rf-step active" id="rfdot-1">
+          <div class="rf-dot">1</div>
+          <span class="rf-dot-lbl">Participant</span>
+        </div>
+        <div class="rf-step" id="rfdot-2">
+          <div class="rf-dot">2</div>
+          <span class="rf-dot-lbl">Referrer</span>
+        </div>
+        <div class="rf-step" id="rfdot-3">
+          <div class="rf-dot">3</div>
+          <span class="rf-dot-lbl">Support Needs</span>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="rf-card">
+        <form id="rfForm" novalidate>
+
+          <!-- ── Step 1: Participant ── -->
+          <div class="rf-panel active" id="rfp-1">
+            <div class="rf-step-title">About the Participant</div>
+            <div class="rf-step-sub">Step 1 of 3 — Person being referred for support</div>
+
+            <div class="rf-row">
+              <div class="rf-field">
+                <label class="rf-label" for="bp_first">First Name <span class="req">*</span></label>
+                <input type="text" id="bp_first" name="participant_first_name" placeholder="e.g. Sarah" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="bp_last">Last Name <span class="req">*</span></label>
+                <input type="text" id="bp_last" name="participant_last_name" placeholder="e.g. Johnson" />
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-field">
+                <label class="rf-label" for="bp_dob">Date of Birth <span class="req">*</span></label>
+                <input type="date" id="bp_dob" name="participant_dob" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="bp_gender">Gender</label>
+                <select id="bp_gender" name="participant_gender">
+                  <option value="">-- Select --</option>
+                  <option>Male</option><option>Female</option>
+                  <option>Non-binary</option><option>Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-field">
+                <label class="rf-label" for="bp_ndis">NDIS Number</label>
+                <input type="text" id="bp_ndis" name="participant_ndis_number" placeholder="e.g. 43XXXXXXX" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="bp_phone">Phone <span class="req">*</span></label>
+                <input type="tel" id="bp_phone" name="participant_phone" placeholder="04XX XXX XXX" />
+              </div>
+            </div>
+            <div class="rf-row full">
+              <div class="rf-field">
+                <label class="rf-label" for="bp_email">Email Address</label>
+                <input type="email" id="bp_email" name="participant_email" placeholder="sarah@email.com" />
+              </div>
+            </div>
+            <div class="rf-row full">
+              <div class="rf-field">
+                <label class="rf-label" for="bp_address">Street Address</label>
+                <input type="text" id="bp_address" name="participant_address" placeholder="12 Main Street" />
+              </div>
+            </div>
+            <div class="rf-row three">
+              <div class="rf-field">
+                <label class="rf-label" for="bp_suburb">Suburb</label>
+                <input type="text" id="bp_suburb" name="participant_suburb" placeholder="Suburb" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="bp_state">State</label>
+                <select id="bp_state" name="participant_state">
+                  <option value="">--</option>
+                  <option>NSW</option><option>VIC</option><option>QLD</option>
+                  <option>SA</option><option>WA</option><option>TAS</option>
+                  <option>NT</option><option>ACT</option>
+                </select>
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="bp_postcode">Postcode</label>
+                <input type="text" id="bp_postcode" name="participant_postcode" placeholder="2148" maxlength="4" />
+              </div>
+            </div>
+
+            <div class="rf-btnrow">
+              <span></span>
+              <button type="button" class="rf-btn rf-btn-next" onclick="rfStep(2)">
+                Next: Referrer Details &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Step 2: Referrer ── -->
+          <div class="rf-panel" id="rfp-2">
+            <div class="rf-step-title">About the Referrer</div>
+            <div class="rf-step-sub">Step 2 of 3 — Person making this referral</div>
+
+            <div class="rf-row">
+              <div class="rf-field">
+                <label class="rf-label" for="br_first">First Name <span class="req">*</span></label>
+                <input type="text" id="br_first" name="referrer_first_name" placeholder="e.g. Mark" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="br_last">Last Name <span class="req">*</span></label>
+                <input type="text" id="br_last" name="referrer_last_name" placeholder="e.g. Williams" />
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-field">
+                <label class="rf-label" for="br_org">Organisation</label>
+                <input type="text" id="br_org" name="referrer_organisation" placeholder="e.g. Community Health Clinic" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="br_role">Role / Position</label>
+                <input type="text" id="br_role" name="referrer_role" placeholder="e.g. Support Coordinator" />
+              </div>
+            </div>
+            <div class="rf-row full">
+              <div class="rf-field">
+                <label class="rf-label" for="br_relationship">Relationship to Participant <span class="req">*</span></label>
+                <select id="br_relationship" name="referrer_relationship">
+                  <option value="">-- Select --</option>
+                  <option>Family member / Carer</option>
+                  <option>Support Coordinator</option>
+                  <option>Plan Manager</option>
+                  <option>Allied Health Professional</option>
+                  <option>GP / Medical Practitioner</option>
+                  <option>Self-referral (participant themselves)</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-field">
+                <label class="rf-label" for="br_phone">Phone <span class="req">*</span></label>
+                <input type="tel" id="br_phone" name="referrer_phone" placeholder="04XX XXX XXX" />
+              </div>
+              <div class="rf-field">
+                <label class="rf-label" for="br_email">Email <span class="req">*</span></label>
+                <input type="email" id="br_email" name="referrer_email" placeholder="mark@clinic.com.au" />
+              </div>
+            </div>
+
+            <div class="rf-btnrow">
+              <button type="button" class="rf-btn rf-btn-back" onclick="rfStep(1)">&larr; Back</button>
+              <button type="button" class="rf-btn rf-btn-next" onclick="rfStep(3)">Next: Support Needs &rarr;</button>
+            </div>
+          </div>
+
+          <!-- ── Step 3: Support Needs ── -->
+          <div class="rf-panel" id="rfp-3">
+            <div class="rf-step-title">Support Needs</div>
+            <div class="rf-step-sub">Step 3 of 3 — Tell us what support is needed</div>
+
+            <div class="rf-field">
+              <label class="rf-label">Support Categories Required <span class="req">*</span></label>
+              <div class="rf-checks">
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Therapeutic Support" /><span>Therapeutic Support</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Support Coordination" /><span>Support Coordination</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Plan Management" /><span>Plan Management</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Daily Living Activities" /><span>Daily Living Activities</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Household Tasks" /><span>Household Tasks</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Travel &amp; Transport" /><span>Travel &amp; Transport</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Community Nursing Care" /><span>Community Nursing Care</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Group Activities" /><span>Group Activities</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Life Skills Development" /><span>Life Skills Development</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Life Stage Transitions" /><span>Life Stage Transitions</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Accommodation / Tenancy" /><span>Accommodation / Tenancy</span></label>
+                <label class="rf-check"><input type="checkbox" name="support[]" value="Community Participation" /><span>Community Participation</span></label>
+              </div>
+              <span class="rf-errmsg" id="rfcat-err" style="display:none">Please select at least one support category.</span>
+            </div>
+
+            <div class="rf-field">
+              <label class="rf-label" for="bs_reason">Current Situation / Reason for Referral <span class="req">*</span></label>
+              <textarea id="bs_reason" name="reason_for_referral" placeholder="Describe the participant's current situation and why they are being referred..."></textarea>
+            </div>
+
+            <div class="rf-field">
+              <label class="rf-label" for="bs_goals">Goals and Aspirations</label>
+              <textarea id="bs_goals" name="goals_aspirations" placeholder="What does the participant want to achieve? What does a good life look like for them? (optional)"></textarea>
+            </div>
+
+            <div class="rf-field">
+              <label class="rf-label">Urgency</label>
+              <div class="rf-radios">
+                <label class="rf-radio"><input type="radio" name="urgency" value="Standard" checked /><span>Standard</span></label>
+                <label class="rf-radio"><input type="radio" name="urgency" value="Urgent" /><span>Urgent</span></label>
+              </div>
+            </div>
+
+            <div class="rf-field">
+              <label class="rf-label" for="bs_howheard">How did you hear about Big Hearts?</label>
+              <select id="bs_howheard" name="how_did_you_hear">
+                <option value="">-- Select --</option>
+                <option>Google Search</option>
+                <option>Referral from another provider</option>
+                <option>Word of mouth</option>
+                <option>NDIS portal / My NDIS</option>
+                <option>Social media</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="rf-field">
+              <label class="rf-label" for="bs_notes">Additional Notes</label>
+              <textarea id="bs_notes" name="additional_notes" placeholder="Any other relevant information... (optional)"></textarea>
+            </div>
+
+            <div class="rf-field">
+              <label class="rf-label">Consent <span class="req">*</span></label>
+              <div class="rf-consent">
+                <input type="checkbox" id="rf_consent" name="consent" />
+                <p>I confirm I have the participant's consent (or am acting with appropriate authority) to submit this referral, and that the information provided is accurate. I understand Big Hearts Disability Services will contact the participant or referrer to discuss this referral.</p>
+              </div>
+              <span class="rf-errmsg" id="rfconsent-err" style="display:none">You must confirm consent before submitting.</span>
+            </div>
+
+            <div class="rf-btnrow">
+              <button type="button" class="rf-btn rf-btn-back" onclick="rfStep(2)">&larr; Back</button>
+              <button type="submit" class="rf-btn rf-btn-submit" id="rfSubmit">Submit Referral</button>
+            </div>
+          </div>
+
+          <!-- ── Success ── -->
+          <div class="rf-success" id="rfSuccess">
+            <div class="rf-tick">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 21l8 8 16-16" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2>Referral Submitted!</h2>
+            <p>Thank you. We have received your referral and a member of our team will be in touch within 2 business days to discuss next steps.</p>
+            <p style="margin-top:12px;font-size:15px;color:#999">Questions? Call <strong style="color:#662C91">0451 071 314</strong> or email <a href="mailto:bigheartsdisabilityservices@gmail.com" style="color:#662C91">bigheartsdisabilityservices@gmail.com</a></p>
+            <a href="index.html" class="back-link">&larr; Back to Big Hearts Home</a>
+          </div>
+
+        </form>
+      </div><!-- /rf-card -->
+
+    </div><!-- /rf -->
+  </div>
+</div>
+
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="https://bigheartsdisabilityservices.com.au/wp-content/uploads/2024/05/Big-Hearts-Logo-files-35-e1715543259480.png"
+             alt="Big Hearts Disability Services" />
+        <p class="footer-about">Empowering people living with disability to live the life they choose — with compassionate, flexible, and professional NDIS support across Sydney.</p>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/profile.php?id=61550624227070" target="_blank" rel="noopener" class="fsoc" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/bigheartsdisability" target="_blank" rel="noopener" class="fsoc" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Our Services</h4>
+        <div class="footer-links">
+          <a href="index.html#services">Therapeutic Support</a>
+          <a href="index.html#services">Support Coordination</a>
+          <a href="index.html#services">Plan Management</a>
+          <a href="index.html#services">Household Tasks</a>
+          <a href="index.html#services">Travel &amp; Transport</a>
+          <a href="index.html#services">Community Nursing</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <div class="footer-links">
+          <a href="index.html#about">About Us</a>
+          <a href="index.html#services">Services</a>
+          <a href="referral.html">Make a Referral</a>
+          <a href="index.html#contact">Contact Us</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.07h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <a href="tel:0451071314"><span>0451 071 314</span></a>
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:bigheartsdisabilityservices@gmail.com"><span>bigheartsdisabilityservices@gmail.com</span></a>
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Blacktown, NSW 2148</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-inner">
+        <p class="footer-ack">Big Hearts Disability Services acknowledges the Traditional Custodians of the lands on which we operate and pay our respects to Elders past, present and emerging. We celebrate the diversity of Aboriginal and Torres Strait Islander peoples and their continuing connection to land, sea and community.</p>
+        <img class="footer-flags"
+             src="https://bigheartsdisabilityservices.com.au/wp-content/uploads/2024/05/Australian-Torres-Strait-Islander-Islande-Aboritinal-Flags-Medium.png"
+             alt="Australian Aboriginal Flag and Torres Strait Islander Flag" />
+        <p class="footer-copy">&copy; 2024 Big Hearts Disability Services. All rights reserved. NDIS Registered Provider.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Main JS (nav, animations) -->
+<script src="js/main.js"></script>
+
+<!-- Referral form JS -->
+<script>
+(function () {
+  var FORMSPREE = 'https://formspree.io/f/xnjryooj';
+  var cur = 1;
+
+  window.rfStep = function (next) {
+    if (next > cur && !rfValidate(cur)) return;
+    var fromDot = document.getElementById('rfdot-' + cur);
+    fromDot.classList.remove('active');
+    if (next > cur) {
+      fromDot.classList.add('done');
+    } else {
+      fromDot.classList.remove('done');
+      document.getElementById('rfdot-' + next).classList.remove('done');
+    }
+    document.getElementById('rfp-' + cur).classList.remove('active');
+    cur = next;
+    document.getElementById('rfp-' + cur).classList.add('active');
+    document.getElementById('rfdot-' + cur).classList.add('active');
+    window.scrollTo({ top: document.querySelector('.referral-page-body').offsetTop - 20, behavior: 'smooth' });
+  };
+
+  function rfValidate(step) {
+    var ok = true;
+    if (step === 1) ok = rfReq(['bp_first','bp_last','bp_dob','bp_phone']);
+    if (step === 2) {
+      ok = rfReq(['br_first','br_last','br_relationship','br_phone','br_email']);
+      if (!rfEmail('br_email')) ok = false;
+    }
+    if (step === 3) {
+      ok = rfReq(['bs_reason']);
+      var cats = document.querySelectorAll('input[name="support[]"]:checked');
+      var catErr = document.getElementById('rfcat-err');
+      if (!cats.length) { catErr.style.display = 'block'; ok = false; }
+      else { catErr.style.display = 'none'; }
+      var consent = document.getElementById('rf_consent');
+      var cErr = document.getElementById('rfconsent-err');
+      if (!consent.checked) { cErr.style.display = 'block'; ok = false; }
+      else { cErr.style.display = 'none'; }
+    }
+    return ok;
+  }
+
+  function rfReq(ids) {
+    var ok = true;
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (!el.value.trim()) { el.classList.add('err'); ok = false; }
+      else { el.classList.remove('err'); }
+    });
+    return ok;
+  }
+
+  function rfEmail(id) {
+    var el = document.getElementById(id);
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (el && el.value && !re.test(el.value)) { el.classList.add('err'); return false; }
+    if (el) el.classList.remove('err');
+    return true;
+  }
+
+  document.querySelectorAll('#rfForm input, #rfForm select, #rfForm textarea').forEach(function (el) {
+    el.addEventListener('input', function () { el.classList.remove('err'); });
+  });
+
+  document.getElementById('rfForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!rfValidate(3)) return;
+    var btn = document.getElementById('rfSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    var fd = new FormData(this);
+    var cats = Array.from(document.querySelectorAll('input[name="support[]"]:checked')).map(function (c) { return c.value; });
+    fd.delete('support[]');
+    fd.append('support_categories', cats.join(', '));
+
+    fetch(FORMSPREE, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+      .then(function (r) {
+        if (r.ok) {
+          document.getElementById('rfp-3').classList.remove('active');
+          document.getElementById('rfStepper').style.display = 'none';
+          document.getElementById('rfSuccess').style.display = 'block';
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Submit Referral';
+          alert('Something went wrong. Please try again or call us on 0451 071 314.');
+        }
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Submit Referral';
+        alert('Network error. Please check your connection and try again.');
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
