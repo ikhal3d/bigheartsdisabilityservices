@@ -153,7 +153,7 @@ section   { padding: var(--pad) 0; }
   justify-content: space-between;
   width: 100%;
 }
-.nav-logo img { height: 46px; transition: filter 0.3s; }
+.nav-logo img { height: 46px; transition: filter 0.3s; filter: brightness(0) invert(1); }
 .nav.scrolled .nav-logo img { filter: none; }
 
 .nav-links { display: flex; align-items: center; gap: 36px; }
@@ -393,22 +393,21 @@ section   { padding: var(--pad) 0; }
 }
 .hero-blob {
   position: absolute;
-  inset: 0;
-  border-radius: 65% 35% 55% 45% / 55% 65% 35% 45%;
-  background: linear-gradient(135deg, rgba(139,197,62,0.25), rgba(255,255,255,0.08));
-  animation: morph 10s ease-in-out infinite;
+  inset: -8px;
+  background: linear-gradient(135deg, rgba(139,197,62,0.30), rgba(255,255,255,0.10));
+  clip-path: url(#heartClip);
+  animation: heartPulse 4s ease-in-out infinite;
 }
-@keyframes morph {
-  0%,100% { border-radius: 65% 35% 55% 45% / 55% 65% 35% 45%; }
-  33%      { border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%; }
-  66%      { border-radius: 50% 50% 65% 35% / 35% 60% 40% 65%; }
+@keyframes heartPulse {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
 }
 .hero-img {
   position: absolute;
-  inset: 16px;
+  inset: 0;
   object-fit: cover;
-  border-radius: 65% 35% 55% 45% / 55% 65% 35% 45%;
-  animation: morph 10s ease-in-out infinite;
+  object-position: center top;
+  clip-path: url(#heartClip);
   filter: brightness(1.05) saturate(1.05);
 }
 
@@ -593,6 +592,7 @@ section   { padding: var(--pad) 0; }
   width: 100%;
   height: 540px;
   object-fit: cover;
+  object-position: left center;
   border-radius: 28px;
   box-shadow: var(--shadow-lg);
   display: block;
@@ -810,7 +810,7 @@ section   { padding: var(--pad) 0; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
-  align-items: start;
+  align-items: center;
 }
 
 .contact-items { display: flex; flex-direction: column; gap: 20px; margin-bottom: 36px; }
@@ -891,7 +891,7 @@ section   { padding: var(--pad) 0; }
 /* ═══════════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════════ */
-.footer { background: var(--dark); padding-top: 72px; }
+.footer { background: #2d1254; padding-top: 72px; }
 
 .footer-top {
   display: grid;

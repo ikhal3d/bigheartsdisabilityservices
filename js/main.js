@@ -111,11 +111,12 @@
     }, { passive: true });
   }
 
-  /* ── Marquee duplicate for seamless loop ── */
+  /* ── Marquee: duplicate items inside the same track for seamless loop ── */
   var track = document.querySelector('.marquee-track');
   if (track) {
-    var clone = track.cloneNode(true);
-    track.parentNode.appendChild(clone);
+    Array.from(track.querySelectorAll('.marquee-item')).forEach(function (item) {
+      track.appendChild(item.cloneNode(true));
+    });
   }
 
 })();
