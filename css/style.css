@@ -444,13 +444,13 @@ section   { padding: var(--pad) 0; }
 
 .hero-ndis {
   position: absolute;
-  top: 24px;
-  left: -28px;
+  top: 20px;
+  left: -20px;
   background: #fff;
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: 18px;
+  padding: 14px 16px;
   box-shadow: var(--shadow-md);
-  width: 90px;
+  width: 160px;
   animation: heroFloat 7s ease-in-out infinite 2s;
 }
 .hero-ndis img { width: 100%; }
